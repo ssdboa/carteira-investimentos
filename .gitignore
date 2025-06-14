@@ -1,0 +1,36 @@
+# Arquivos de Ambiente e Segredos
+# Nunca envie arquivos com senhas ou chaves de API!
+.env
+.env.*
+!.env.example
+
+# Ambientes Virtuais e Caches do Python
+venv/
+*.pyc
+__pycache__/
+.pytest_cache/
+
+# Dependências do Node.js
+# Esta pasta pode ter milhares de arquivos e centenas de megabytes
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Arquivos de Build do Frontend
+build/
+dist/
+.vercel/
+
+# Arquivos de Sistema Operacional
+.DS_Store
+Thumbs.db
+
+# Arquivos de configuração de Editores e IDEs
+.idea/
+.vscode/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
