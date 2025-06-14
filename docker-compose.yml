@@ -1,0 +1,33 @@
+# docker-compose.yml
+
+version: '3.8'
+
+services:
+  # Serviço do Banco de Dados PostgreSQL
+  db:
+    image: postgres:16-alpine  # Usando a versão 16 que planejamos, variante 'alpine' que é leve
+    volumes:
+      - postgres_data:/var/lib/postgresql/data/  # Garante que os dados do banco persistam
+    environment:
+      - POSTGRES_USER=admin
+      - POSTGRES_PASSWORD=admin
+      - POSTGRES_DB=carteira_dev
+    ports:
+      - "5432:5432"  # Mapeia a porta do contêiner para a sua máquina (opcional)
+
+  # Serviço da nossa API Django
+  api:
+    build: ./backend  # Instrução para construir a imagem usando o Dockerfile da pasta 'backend'
+    command: python manage.py runserver 0.0.0.0:8000 # Comando padrão para rodar em dev
+    volumes:
+      - ./backend:/app  # Mapeia o código local para dentro do contêiner para live-reload
+    ports:
+      - "8000:8000"  # Mapeia a porta 8000 do contêiner para a porta 8000 da sua máquina
+    environment:
+      - POSTGRES_USER=admin
+      - POSTGRES_PASSWORD=admin
+    depends_on:
+      - db  # Diz ao Docker para iniciar o serviço 'db' ANTES de iniciar a 'api'
+
+volumes:
+  postgres_data: # Define o volume que será usado pelo serviço 'db'
