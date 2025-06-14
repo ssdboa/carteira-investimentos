@@ -1,0 +1,10 @@
+# backend/requirements.txt
+
+# O framework web principal
+django==5.2.3
+
+# O servidor que rodará a aplicação em produção/docker
+gunicorn==22.0.0
+
+# O "tradutor" que permite o Django conversar com o PostgreSQL
+psycopg2-binary==2.9.9
