@@ -10,6 +10,8 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/5.2/ref/settings/
 """
 import os # Certifique-se de que 'os' está importado no topo do arquivo
+import re
+
 from pathlib import Path
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -149,14 +151,24 @@ STATIC_URL = 'static/'
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 # ==============================================================================
-# CONFIGURAÇÕES DO CORS (TESTE DE DIAGNÓSTICO)
+# CONFIGURAÇÕES DO CORS (VERSÃO DEFINITIVA)
 # ==============================================================================
-CORS_ALLOWED_ORIGINS = [
-    "https://carteira-investimentos-aunqtp61k-jonas-projects-de8b1944.vercel.app",
-    "https://carteira-investimentos-amber.vercel.app",
-]
 
-# Opcional: para desenvolvimento local, se quiser acessar a API de outro lugar
+# Lista de origens estáticas e confiáveis (sua URL de produção principal)
+# Lida da variável de ambiente
+CORS_ALLOWED_ORIGINS_ENV = os.environ.get('CORS_ALLOWED_ORIGINS')
+CORS_ALLOWED_ORIGINS = []
+if CORS_ALLOWED_ORIGINS_ENV:
+    CORS_ALLOWED_ORIGINS.extend([origin.strip() for origin in CORS_ALLOWED_ORIGINS_ENV.split(',') if origin.strip()])
+
+# Lista de padrões de regex para origens confiáveis (todas as suas URLs de preview)
+# Lida da variável de ambiente
+CORS_ALLOWED_ORIGIN_REGEXES_ENV = os.environ.get('CORS_ALLOWED_ORIGIN_REGEXES')
+CORS_ALLOWED_ORIGIN_REGEXES = []
+if CORS_ALLOWED_ORIGIN_REGEXES_ENV:
+    CORS_ALLOWED_ORIGIN_REGEXES.extend([origin.strip() for origin in CORS_ALLOWED_ORIGIN_REGEXES_ENV.split(',') if origin.strip()])
+
+# Para desenvolvimento local, se DEBUG=True
 if DEBUG:
     CORS_ALLOWED_ORIGINS.extend([
         "http://localhost:3000",
