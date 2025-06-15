@@ -26,6 +26,9 @@ services:
       - POSTGRES_PASSWORD=admin
     depends_on:
       - db  # Diz ao Docker para iniciar o serviço 'db' ANTES de iniciar a 'api'
+    
+    #A expressão $(id -u):$(id -g) será substituída dinamicamente pelo seu UID (1000) e GID(1000) atual quando você rodar docker compose up.
+    user: "1000:1000" 
 
   frontend:
     build:
