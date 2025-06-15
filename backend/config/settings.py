@@ -15,17 +15,35 @@ from pathlib import Path
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/5.2/howto/deployment/checklist/
 
-# SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-f*dle3gue-a)1$r)k*ttz92libvr9aeygqds3gtnbiz26*jv03'
+# SECRET_KEY: Leia da variável de ambiente. Use um valor padrão APENAS para desenvolvimento local
+# se a variável não estiver definida.
+SECRET_KEY = os.environ.get('SECRET_KEY', 'django-insecure-f*dle3gue-a)1$r)k*ttz92libvr9aeygqds3gtnbiz26*jv03')
 
-# SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+# DEBUG: Leia da variável de ambiente. Converta para booleano.
+# O valor padrão 'False' garante que seja seguro se a variável não for definida.
+DEBUG_STR = os.environ.get('DEBUG', 'False')
+DEBUG = DEBUG_STR.upper() == 'TRUE'
 
-ALLOWED_HOSTS = []
+# ALLOWED_HOSTS: Leia da variável de ambiente.
+# Se a variável DJANGO_ALLOWED_HOSTS for "host1.com,host2.com", isso criará ['host1.com', 'host2.com']
+# Se for "carteira-api-develop.onrender.com", criará ['carteira-api-develop.onrender.com']
+ALLOWED_HOSTS_ENV = os.environ.get('DJANGO_ALLOWED_HOSTS')
+if ALLOWED_HOSTS_ENV:
+    ALLOWED_HOSTS = [host.strip() for host in ALLOWED_HOSTS_ENV.split(',') if host.strip()]
+else:
+    # Se DEBUG for True e a variável não estiver definida, permita localhost para desenvolvimento.
+    # Se DEBUG for False, esta lista DEVE ser preenchida pela variável de ambiente.
+    if DEBUG:
+        ALLOWED_HOSTS = ['localhost', '127.0.0.1']
+    else:
+        ALLOWED_HOSTS = [] # Em produção (DEBUG=False), se não vier do ambiente, será vazio (e causará erro se não configurado no Render)
+
+# Importante: Se DEBUG for False e ALLOWED_HOSTS estiver vazio, o Django não iniciará corretamente.
+# A configuração no Render garante que DJANGO_ALLOWED_HOSTS seja preenchido.
+
 
 
 # Application definition
