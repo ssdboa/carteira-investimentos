@@ -1,35 +1,57 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
+import { useState, useEffect } from 'react';
+import reactLogo from './assets/react.svg';
+import viteLogo from '/vite.svg';
+import './App.css';
 
 function App() {
-  const [count, setCount] = useState(0)
+  const [message, setMessage] = useState('Buscando mensagem da API...');
+  
+  // Lendo a variável de ambiente que configuramos na Vercel
+  const apiUrl = import.meta.env.VITE_API_URL;
+
+  useEffect(() => {
+    // Verificação de segurança
+    if (!apiUrl) {
+      setMessage('Erro: A variável de ambiente VITE_API_URL não está configurada na Vercel.');
+      return;
+    }
+
+    // O ponto principal: chamando a URL completa da API na Render
+    fetch(`${apiUrl}/api/public/teste/`)
+      .then(response => {
+        if (!response.ok) {
+          throw new Error(`Erro de Rede ou HTTP: ${response.status}`);
+        }
+        return response.json();
+      })
+      .then(data => {
+        setMessage(data.message || 'API respondeu, mas sem a mensagem esperada.');
+      })
+      .catch(error => {
+        console.error('Erro ao buscar da API:', error);
+        setMessage(`Falha ao conectar com a API. Verifique o console do navegador (tecla F12) para erros de CORS ou rede.`);
+      });
+  }, [apiUrl]); // O array de dependências garante que isso rode apenas uma vez
 
   return (
     <>
       <div>
-        <a href="https://vite.dev" target="_blank">
+        <a href="https://vitejs.dev" target="_blank">
           <img src={viteLogo} className="logo" alt="Vite logo" />
         </a>
-        <a href="https://react.dev" target="_blank">
+        <a href="https://reactjs.org" target="_blank">
           <img src={reactLogo} className="logo react" alt="React logo" />
         </a>
       </div>
-      <h1>Vite + React</h1>
+      <h1>Carteira de Investimentos Inteligente</h1>
       <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
+        <h2>Status da Conexão com a API:</h2>
         <p>
-          Edit <code>src/App.tsx</code> and save to test HMR
+          <strong>{message}</strong>
         </p>
       </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
     </>
-  )
+  );
 }
 
-export default App
+export default App;
