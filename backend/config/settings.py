@@ -149,10 +149,11 @@ STATIC_URL = 'static/'
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 # ==============================================================================
-# CONFIGURAÇÕES DO CORS
+# CONFIGURAÇÕES DO CORS (TESTE DE DIAGNÓSTICO)
 # ==============================================================================
 CORS_ALLOWED_ORIGINS = [
-    "https://carteira-investimentos-amber.vercel.app",  # <--- SEU FRONTEND
+    "https://carteira-investimentos-aunqtp61k-jonas-projects-de8b1944.vercel.app",
+    "https://carteira-investimentos-amber.vercel.app",
 ]
 
 # Opcional: para desenvolvimento local, se quiser acessar a API de outro lugar
