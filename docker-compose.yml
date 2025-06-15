@@ -27,5 +27,46 @@ services:
     depends_on:
       - db  # Diz ao Docker para iniciar o serviço 'db' ANTES de iniciar a 'api'
 
+  frontend:
+    build:
+      context: ./frontend # Define o contexto de build para a pasta frontend
+    ports:
+      - "3000:80" # Mapeia a porta 3000 do seu host para a porta 80 do container Nginx
+                  # Você acessará o frontend em http://localhost:3000
+    volumes:
+      - ./frontend/src:/app/src # Monta apenas a pasta 'src' para live reload do código React
+                                # Não montamos 'node_modules' do host para o container
+      # Se você precisar que o Nginx recarregue a config em mudanças no nginx.conf (avançado):
+      # - ./frontend/nginx.conf:/etc/nginx/conf.d/nginx.conf:ro
+    depends_on:
+      - api # O frontend depende da API para o proxy funcionar
+    # (Opcional) Para desenvolvimento com Vite e HMR (Hot Module Replacement) dentro do container:
+    # Se você quiser o HMR do Vite funcionando diretamente do container, a config é mais complexa
+    # e geralmente envolve rodar o servidor de dev do Vite (npm run dev) no container
+    # em vez de servir arquivos estáticos com Nginx. Por enquanto, vamos com Nginx
+    # que é mais próximo da produção e o proxy resolve a comunicação com a API.
+    # O build estático com Nginx significa que mudanças no código React exigirão um rebuild da imagem
+    # do frontend para serem refletidas, a menos que usemos truques com volumes ou HMR.
+    # Para live reload com o setup atual (Nginx servindo build estático),
+    # o volume montado em /app/src não terá efeito imediato sem um processo de watch e rebuild
+    # dentro do container ou um rebuild manual da imagem 'frontend'.
+    #
+    # ALTERNATIVA PARA DESENVOLVIMENTO COM LIVE RELOAD NO FRONTEND (MAIS SIMPLES INICIALMENTE):
+    # Em vez de montar apenas /app/src e esperar que o Nginx sirva,
+    # podemos montar todo o código do frontend e fazer o Nginx servir os arquivos
+    # que são atualizados no host.
+    # Para um live reload mais efetivo com o Nginx servindo arquivos estáticos,
+    # o ideal seria que o processo de build do frontend rodasse novamente
+    # quando os arquivos em ./frontend/src mudassem.
+    #
+    # Vamos simplificar o volume por agora para apenas montar o código fonte.
+    # A reflexão das mudanças dependerá de como o Vite e Nginx interagem com isso,
+    # ou de um rebuild.
+    #
+    # Para live reload EFETIVO com VITE, o ideal é rodar o servidor de dev do Vite no container.
+    # Vamos manter o build com Nginx por enquanto, e abordamos o live reload otimizado do Vite depois se necessário.
+    # Se você fizer alterações no código React, precisará rodar 'docker compose build frontend'
+    # e depois 'docker compose up frontend' ou 'docker compose up --build frontend'
+
 volumes:
   postgres_data: # Define o volume que será usado pelo serviço 'db'
