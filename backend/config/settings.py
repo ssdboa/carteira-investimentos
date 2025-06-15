@@ -58,10 +58,12 @@ INSTALLED_APPS = [
 
      # Meus Apps
     'apps.public_api.apps.PublicApiConfig', 
+    'corsheaders', 
 ]
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
+    'corsheaders.middleware.CorsMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
@@ -145,3 +147,17 @@ STATIC_URL = 'static/'
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+# ==============================================================================
+# CONFIGURAÇÕES DO CORS
+# ==============================================================================
+CORS_ALLOWED_ORIGINS = [
+    "https://carteira-investimentos-amber.vercel.app",  # <--- SEU FRONTEND
+]
+
+# Opcional: para desenvolvimento local, se quiser acessar a API de outro lugar
+if DEBUG:
+    CORS_ALLOWED_ORIGINS.extend([
+        "http://localhost:3000",
+        "http://127.0.0.1:3000",
+    ])
