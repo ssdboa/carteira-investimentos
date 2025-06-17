@@ -5,19 +5,10 @@ import './App.css';
 
 function App() {
   const [message, setMessage] = useState('Buscando mensagem da API...');
-  
-  // Lendo a variável de ambiente que configuramos na Vercel
-  const apiUrl = import.meta.env.VITE_API_URL;
 
   useEffect(() => {
-    // Verificação de segurança
-    if (!apiUrl) {
-      setMessage('Erro: A variável de ambiente VITE_API_URL não está configurada na Vercel.');
-      return;
-    }
-
-    // O ponto principal: chamando a URL completa da API na Render
-    fetch(`${apiUrl}/api/public/teste/`)
+    // Fazendo a chamada para o caminho relativo da API
+    fetch('/api/public/teste/') // <--- MUDANÇA PRINCIPAL AQUI
       .then(response => {
         if (!response.ok) {
           throw new Error(`Erro de Rede ou HTTP: ${response.status}`);
@@ -29,9 +20,9 @@ function App() {
       })
       .catch(error => {
         console.error('Erro ao buscar da API:', error);
-        setMessage(`Falha ao conectar com a API. Verifique o console do navegador (tecla F12) para erros de CORS ou rede.`);
+        setMessage(`Falha ao conectar com a API.`);
       });
-  }, [apiUrl]); // O array de dependências garante que isso rode apenas uma vez
+  }, []); // Array vazio para rodar só uma vez
 
   return (
     <>
