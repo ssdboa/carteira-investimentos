@@ -99,12 +99,12 @@ WSGI_APPLICATION = 'config.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.postgresql',
-        'NAME': os.environ.get('POSTGRES_DB', 'carteira_dev'),
-        'USER': os.environ.get('POSTGRES_USER', 'admin'),
-        'PASSWORD': os.environ.get('POSTGRES_PASSWORD', 'admin'),
-        'HOST': os.environ.get('POSTGRES_HOST', 'db'), # 'db' é o nome do serviço do banco de dados no docker-compose.yml
-        'PORT': os.environ.get('POSTGRES_PORT', '5432'),
+        'ENGINE': 'django.db.backends.mysql',
+        'NAME': os.environ.get('MYSQL_DATABASE', 'carteira_dev'),
+        'USER': os.environ.get('MYSQL_USER', 'admin'),
+        'PASSWORD': os.environ.get('MYSQL_PASSWORD', 'admin'),
+        'HOST': os.environ.get('DB_HOST', 'db'),
+        'PORT': os.environ.get('MYSQL_PORT', '3306'),
     }
 }
 

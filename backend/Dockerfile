@@ -16,6 +16,14 @@ ENV PYTHONUNBUFFERED=1
 # Todos os comandos a partir daqui serão executados dentro da pasta /app no contêiner.
 WORKDIR /app
 
+# ---- PASSO NOVO ----
+# Instalar as dependências do sistema operacional necessárias
+# para construir o mysqlclient.
+RUN apt-get update && apt-get install -y \
+    build-essential \
+    pkg-config \
+    default-libmysqlclient-dev
+
 # PASSO 4: Instalar as dependências
 # Copiamos APENAS o arquivo de dependências primeiro.
 COPY requirements.txt .
