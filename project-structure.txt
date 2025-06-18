@@ -1,0 +1,44 @@
+.
+├── backend
+│   ├── apps
+│   │   ├── public_api
+│   │   └── __init__.py
+│   ├── config
+│   │   ├── __init__.py
+│   │   ├── asgi.py
+│   │   ├── settings.py
+│   │   ├── urls.py
+│   │   └── wsgi.py
+│   ├── Dockerfile
+│   ├── db.sqlite3
+│   ├── manage.py
+│   └── requirements.txt
+├── docker
+├── docs
+├── frontend
+│   ├── public
+│   │   └── vite.svg
+│   ├── src
+│   │   ├── assets
+│   │   ├── App.css
+│   │   ├── App.tsx
+│   │   ├── index.css
+│   │   ├── main.tsx
+│   │   └── vite-env.d.ts
+│   ├── Dockerfile
+│   ├── README.md
+│   ├── eslint.config.js
+│   ├── index.html
+│   ├── nginx.conf
+│   ├── package-lock.json
+│   ├── package.json
+│   ├── tsconfig.app.json
+│   ├── tsconfig.json
+│   ├── tsconfig.node.json
+│   └── vite.config.ts
+├── scripts
+├── README.md
+├── docker-compose.yml
+└── project-structure.txt
+
+11 directories, 30 files

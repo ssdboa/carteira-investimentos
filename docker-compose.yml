@@ -3,15 +3,21 @@
 services:
   # Serviço do Banco de Dados PostgreSQL
   db:
-    image: postgres:16-alpine  # Usando a versão 16 que planejamos, variante 'alpine' que é leve
-    volumes:
-      - postgres_data:/var/lib/postgresql/data/  # Garante que os dados do banco persistam
-    environment:
-      - POSTGRES_USER=admin
-      - POSTGRES_PASSWORD=admin
-      - POSTGRES_DB=carteira_dev
-    ports:
-      - "5432:5432"  # Mapeia a porta do contêiner para a sua máquina (opcional)
+      image: mysql:8.0  # Imagem oficial do MySQL, versão 8.0 é muito estável
+      volumes:
+        - mysql_data:/var/lib/mysql # Mapeia os dados do MySQL para um volume persistente
+      environment:
+        - MYSQL_ROOT_PASSWORD=admin # Senha do superusuário do banco
+        - MYSQL_DATABASE=carteira_dev  # Nome do banco de dados que será criado
+        - MYSQL_USER=admin             # Nome do usuário da aplicação
+        - MYSQL_PASSWORD=admin         # Senha do usuário da aplicação
+      ports:
+        - "3306:3306" # A porta padrão do MySQL é 3306
+      healthcheck:
+        test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+        interval: 10s
+        timeout: 5s
+        retries: 5
 
   # Serviço da nossa API Django
   api:
@@ -22,10 +28,16 @@ services:
     ports:
       - "8000:8000"  # Mapeia a porta 8000 do contêiner para a porta 8000 da sua máquina
     environment:
-      - POSTGRES_USER=admin
-      - POSTGRES_PASSWORD=admin
+      - DEBUG=True
+      - DJANGO_ALLOWED_HOSTS=localhost,127.0.0.1
+      - MYSQL_DATABASE=carteira_dev
+      - MYSQL_USER=admin
+      - MYSQL_PASSWORD=admin
+      - DB_HOST=db
+      - MYSQL_PORT=3306
     depends_on:
-      - db  # Diz ao Docker para iniciar o serviço 'db' ANTES de iniciar a 'api'
+      db:
+        condition: service_healthy
     
     #A expressão $(id -u):$(id -g) será substituída dinamicamente pelo seu UID (1000) e GID(1000) atual quando você rodar docker compose up.
     user: "1000:1000" 
@@ -72,4 +84,4 @@ services:
     # e depois 'docker compose up frontend' ou 'docker compose up --build frontend'
 
 volumes:
-  postgres_data: # Define o volume que será usado pelo serviço 'db'
+  mysql_data: # Define o volume que será usado pelo serviço 'db'

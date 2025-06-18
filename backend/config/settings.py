@@ -10,22 +10,42 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/5.2/ref/settings/
 """
 import os # Certifique-se de que 'os' está importado no topo do arquivo
+import re
+
 from pathlib import Path
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/5.2/howto/deployment/checklist/
 
-# SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-f*dle3gue-a)1$r)k*ttz92libvr9aeygqds3gtnbiz26*jv03'
+# SECRET_KEY: Leia da variável de ambiente. Use um valor padrão APENAS para desenvolvimento local
+# se a variável não estiver definida.
+SECRET_KEY = os.environ.get('SECRET_KEY', 'django-insecure-f*dle3gue-a)1$r)k*ttz92libvr9aeygqds3gtnbiz26*jv03')
 
-# SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+# DEBUG: Leia da variável de ambiente. Converta para booleano.
+# O valor padrão 'False' garante que seja seguro se a variável não for definida.
+DEBUG_STR = os.environ.get('DEBUG', 'False')
+DEBUG = DEBUG_STR.upper() == 'TRUE'
 
-ALLOWED_HOSTS = []
+# ALLOWED_HOSTS: Leia da variável de ambiente.
+# Se a variável DJANGO_ALLOWED_HOSTS for "host1.com,host2.com", isso criará ['host1.com', 'host2.com']
+# Se for "carteira-api-develop.onrender.com", criará ['carteira-api-develop.onrender.com']
+ALLOWED_HOSTS_ENV = os.environ.get('DJANGO_ALLOWED_HOSTS')
+if ALLOWED_HOSTS_ENV:
+    ALLOWED_HOSTS = [host.strip() for host in ALLOWED_HOSTS_ENV.split(',') if host.strip()]
+else:
+    # Se DEBUG for True e a variável não estiver definida, permita localhost para desenvolvimento.
+    # Se DEBUG for False, esta lista DEVE ser preenchida pela variável de ambiente.
+    if DEBUG:
+        ALLOWED_HOSTS = ['localhost', '127.0.0.1']
+    else:
+        ALLOWED_HOSTS = [] # Em produção (DEBUG=False), se não vier do ambiente, será vazio (e causará erro se não configurado no Render)
+
+# Importante: Se DEBUG for False e ALLOWED_HOSTS estiver vazio, o Django não iniciará corretamente.
+# A configuração no Render garante que DJANGO_ALLOWED_HOSTS seja preenchido.
+
 
 
 # Application definition
@@ -40,10 +60,12 @@ INSTALLED_APPS = [
 
      # Meus Apps
     'apps.public_api.apps.PublicApiConfig', 
+    'corsheaders', 
 ]
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
+    'corsheaders.middleware.CorsMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
@@ -77,12 +99,12 @@ WSGI_APPLICATION = 'config.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.postgresql',
-        'NAME': os.environ.get('POSTGRES_DB', 'carteira_dev'),
-        'USER': os.environ.get('POSTGRES_USER', 'admin'),
-        'PASSWORD': os.environ.get('POSTGRES_PASSWORD', 'admin'),
-        'HOST': os.environ.get('POSTGRES_HOST', 'db'), # 'db' é o nome do serviço do banco de dados no docker-compose.yml
-        'PORT': os.environ.get('POSTGRES_PORT', '5432'),
+        'ENGINE': 'django.db.backends.mysql',
+        'NAME': os.environ.get('MYSQL_DATABASE', 'carteira_dev'),
+        'USER': os.environ.get('MYSQL_USER', 'admin'),
+        'PASSWORD': os.environ.get('MYSQL_PASSWORD', 'admin'),
+        'HOST': os.environ.get('DB_HOST', 'db'),
+        'PORT': os.environ.get('MYSQL_PORT', '3306'),
     }
 }
 
@@ -127,3 +149,28 @@ STATIC_URL = 'static/'
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+# ==============================================================================
+# CONFIGURAÇÕES DO CORS (VERSÃO DEFINITIVA)
+# ==============================================================================
+
+# Lista de origens estáticas e confiáveis (sua URL de produção principal)
+# Lida da variável de ambiente
+CORS_ALLOWED_ORIGINS_ENV = os.environ.get('CORS_ALLOWED_ORIGINS')
+CORS_ALLOWED_ORIGINS = []
+if CORS_ALLOWED_ORIGINS_ENV:
+    CORS_ALLOWED_ORIGINS.extend([origin.strip() for origin in CORS_ALLOWED_ORIGINS_ENV.split(',') if origin.strip()])
+
+# Lista de padrões de regex para origens confiáveis (todas as suas URLs de preview)
+# Lida da variável de ambiente
+CORS_ALLOWED_ORIGIN_REGEXES_ENV = os.environ.get('CORS_ALLOWED_ORIGIN_REGEXES')
+CORS_ALLOWED_ORIGIN_REGEXES = []
+if CORS_ALLOWED_ORIGIN_REGEXES_ENV:
+    CORS_ALLOWED_ORIGIN_REGEXES.extend([origin.strip() for origin in CORS_ALLOWED_ORIGIN_REGEXES_ENV.split(',') if origin.strip()])
+
+# Para desenvolvimento local, se DEBUG=True
+if DEBUG:
+    CORS_ALLOWED_ORIGINS.extend([
+        "http://localhost:3000",
+        "http://127.0.0.1:3000",
+    ])
