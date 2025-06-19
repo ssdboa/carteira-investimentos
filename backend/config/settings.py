@@ -59,7 +59,8 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
 
      # Meus Apps
-    'apps.public_api.apps.PublicApiConfig', 
+    'apps.public_api.apps.PublicApiConfig',
+    'apps.authentication.apps.AuthenticationConfig',
     'corsheaders', 
 ]
 
