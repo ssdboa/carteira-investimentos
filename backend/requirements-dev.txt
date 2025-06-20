@@ -1,0 +1,12 @@
+# backend/requirements-dev.txt
+
+# Este arquivo herda as dependências de produção
+-r requirements.txt
+
+# Ferramentas de Teste
+pytest==8.2.2
+pytest-django==4.8.0
+
+# Formatador de Código e Linter
+black==24.4.2
+flake8==7.1.0
