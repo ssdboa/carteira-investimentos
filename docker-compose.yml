@@ -1,87 +1,53 @@
-# docker-compose.yml
+# docker-compose.yml (Desenvolvimento com MySQL)
 
 services:
-  # Serviço do Banco de Dados PostgreSQL
+  # Serviço do Banco de Dados MySQL
   db:
-      image: mysql:8.0  # Imagem oficial do MySQL, versão 8.0 é muito estável
-      volumes:
-        - mysql_data:/var/lib/mysql # Mapeia os dados do MySQL para um volume persistente
-      environment:
-        - MYSQL_ROOT_PASSWORD=admin # Senha do superusuário do banco
-        - MYSQL_DATABASE=carteira_dev  # Nome do banco de dados que será criado
-        - MYSQL_USER=admin             # Nome do usuário da aplicação
-        - MYSQL_PASSWORD=admin         # Senha do usuário da aplicação
-      ports:
-        - "3306:3306" # A porta padrão do MySQL é 3306
-      healthcheck:
-        test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
-        interval: 10s
-        timeout: 5s
-        retries: 5
-
-  # Serviço da nossa API Django
-  api:
-    build: ./backend  # Instrução para construir a imagem usando o Dockerfile da pasta 'backend'
-    command: python manage.py runserver 0.0.0.0:8000 # Comando padrão para rodar em dev
+    image: mysql:8.0
     volumes:
-      - ./backend:/app  # Mapeia o código local para dentro do contêiner para live-reload
-    ports:
-      - "8000:8000"  # Mapeia a porta 8000 do contêiner para a porta 8000 da sua máquina
+      - mysql_data:/var/lib/mysql
     environment:
-      - DEBUG=True
-      - DJANGO_ALLOWED_HOSTS=localhost,127.0.0.1
+      - MYSQL_ROOT_PASSWORD=admin
       - MYSQL_DATABASE=carteira_dev
       - MYSQL_USER=admin
       - MYSQL_PASSWORD=admin
-      - DB_HOST=db
+    ports:
+      - "3306:3306"
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # Serviço da nossa API Django
+  api:
+    build: ./backend
+    command: python manage.py runserver 0.0.0.0:8000
+    volumes:
+      - ./backend:/app
+    ports:
+      - "8000:8000"
+    environment:
+      # Variáveis para a API se conectar ao serviço 'db'
+      - MYSQL_DATABASE=carteira_dev
+      - MYSQL_USER=admin
+      - MYSQL_PASSWORD=admin
+      - DB_HOST=db  # Importante: o host é o nome do serviço 'db'
       - MYSQL_PORT=3306
     depends_on:
       db:
-        condition: service_healthy
-    
-    #A expressão $(id -u):$(id -g) será substituída dinamicamente pelo seu UID (1000) e GID(1000) atual quando você rodar docker compose up.
-    user: "1000:1000" 
+        condition: service_healthy # Garante que a API só inicia depois do DB
+    user: "1000:1000"
 
   frontend:
     build:
-      context: ./frontend # Define o contexto de build para a pasta frontend
+      context: ./frontend
     ports:
-      - "3000:80" # Mapeia a porta 3000 do seu host para a porta 80 do container Nginx
-                  # Você acessará o frontend em http://localhost:3000
+      - "3000:80"
     volumes:
-      - ./frontend/src:/app/src # Monta apenas a pasta 'src' para live reload do código React
-                                # Não montamos 'node_modules' do host para o container
-      # Se você precisar que o Nginx recarregue a config em mudanças no nginx.conf (avançado):
-      # - ./frontend/nginx.conf:/etc/nginx/conf.d/nginx.conf:ro
+      - ./frontend/src:/app/src
     depends_on:
-      - api # O frontend depende da API para o proxy funcionar
-    # (Opcional) Para desenvolvimento com Vite e HMR (Hot Module Replacement) dentro do container:
-    # Se você quiser o HMR do Vite funcionando diretamente do container, a config é mais complexa
-    # e geralmente envolve rodar o servidor de dev do Vite (npm run dev) no container
-    # em vez de servir arquivos estáticos com Nginx. Por enquanto, vamos com Nginx
-    # que é mais próximo da produção e o proxy resolve a comunicação com a API.
-    # O build estático com Nginx significa que mudanças no código React exigirão um rebuild da imagem
-    # do frontend para serem refletidas, a menos que usemos truques com volumes ou HMR.
-    # Para live reload com o setup atual (Nginx servindo build estático),
-    # o volume montado em /app/src não terá efeito imediato sem um processo de watch e rebuild
-    # dentro do container ou um rebuild manual da imagem 'frontend'.
-    #
-    # ALTERNATIVA PARA DESENVOLVIMENTO COM LIVE RELOAD NO FRONTEND (MAIS SIMPLES INICIALMENTE):
-    # Em vez de montar apenas /app/src e esperar que o Nginx sirva,
-    # podemos montar todo o código do frontend e fazer o Nginx servir os arquivos
-    # que são atualizados no host.
-    # Para um live reload mais efetivo com o Nginx servindo arquivos estáticos,
-    # o ideal seria que o processo de build do frontend rodasse novamente
-    # quando os arquivos em ./frontend/src mudassem.
-    #
-    # Vamos simplificar o volume por agora para apenas montar o código fonte.
-    # A reflexão das mudanças dependerá de como o Vite e Nginx interagem com isso,
-    # ou de um rebuild.
-    #
-    # Para live reload EFETIVO com VITE, o ideal é rodar o servidor de dev do Vite no container.
-    # Vamos manter o build com Nginx por enquanto, e abordamos o live reload otimizado do Vite depois se necessário.
-    # Se você fizer alterações no código React, precisará rodar 'docker compose build frontend'
-    # e depois 'docker compose up frontend' ou 'docker compose up --build frontend'
+      - api
 
 volumes:
   mysql_data: # Define o volume que será usado pelo serviço 'db'
