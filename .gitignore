@@ -1,36 +1,54 @@
-# Arquivos de Ambiente e Segredos
-# Nunca envie arquivos com senhas ou chaves de API!
+# Segredos e Arquivos de Ambiente
+# NUNCA comitar segredos.
 .env
 .env.*
 !.env.example
 
-# Ambientes Virtuais e Caches do Python
+# Ambientes Virtuais
+# Ignora a pasta do nosso ambiente virtual e outros nomes comuns.
+.venv/
 venv/
-*.pyc
+env/
+
+# Caches e Artefatos do Python
 __pycache__/
+*.pyc
+*.pyo
+*.pyd
 .pytest_cache/
 
 # Dependências do Node.js
-# Esta pasta pode ter milhares de arquivos e centenas de megabytes
+# Essencial para qualquer projeto com frontend JS
 node_modules/
+
+# Arquivos de Build do Frontend
+dist/
+build/
+.vercel/
+
+# Banco de Dados Local
+# Ignora qualquer banco de dados SQLite que possa ser criado.
+db.sqlite3
+*.sqlite
+*.sqlite3
+
+# Logs
+logs/
+*.log
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 
-# Arquivos de Build do Frontend
-build/
-dist/
-.vercel/
+# Relatórios de Testes
+coverage/
+.nyc_output/
+
+# Arquivos de Configuração de Editor e IDE
+# Permite que cada dev tenha sua config local
+.idea/
+.vscode/
+*.swp
 
 # Arquivos de Sistema Operacional
 .DS_Store
 Thumbs.db
-
-# Arquivos de configuração de Editores e IDEs
-.idea/
-.vscode/
-*.suo
-*.ntvs*
-*.njsproj
-*.sln
-*.sw?
