@@ -2,7 +2,7 @@
 
 import os
 from pathlib import Path
-from dotenv import load_dotenv  # 1. Adicionar esta importação
+from dotenv import load_dotenv
 
 # Build paths...
 BASE_DIR = Path(__file__).resolve().parent.parent.parent
@@ -27,6 +27,7 @@ INSTALLED_APPS = [
 
     # Meus Apps
     'apps.public_api.apps.PublicApiConfig',
+    'apps.users.apps.UsersConfig',
 ]
 
 MIDDLEWARE = [

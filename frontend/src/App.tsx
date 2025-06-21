@@ -8,7 +8,7 @@ function App() {
 
   useEffect(() => {
     // Fazendo a chamada para o caminho relativo da API
-    fetch('/api/public/teste/') // <--- MUDANÇA PRINCIPAL AQUI
+    fetch('/api/public/status/')
       .then(response => {
         if (!response.ok) {
           throw new Error(`Erro de Rede ou HTTP: ${response.status}`);

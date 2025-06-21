@@ -1,8 +1,17 @@
 # backend/apps/public_api/views.py
-from django.http import JsonResponse
 
-def teste_api_view(request):
+from rest_framework import status
+from rest_framework.decorators import api_view, permission_classes, renderer_classes
+from rest_framework.permissions import AllowAny
+from rest_framework.renderers import JSONRenderer  # Importe o JSONRenderer
+from rest_framework.response import Response
+
+
+@api_view(['GET'])
+@permission_classes([AllowAny])
+@renderer_classes([JSONRenderer])  # <-- ADICIONE ESTA LINHA
+def public_api_status(request):
     """
-    Uma view de teste simples para a public_api.
+    Um endpoint simples para verificar se a API pública está online.
     """
-    return JsonResponse({"message": "Olá da public_api do Django!"})
+    return Response({"message": "API Pública conectada com sucesso!"}, status=status.HTTP_200_OK)
