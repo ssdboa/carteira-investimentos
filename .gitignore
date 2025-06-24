@@ -51,4 +51,5 @@ coverage/
 
 # Arquivos de Sistema Operacional
 .DS_Store
-Thumbs.db
+Thumbs.db.env.production
+/backend/staticfiles/

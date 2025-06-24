@@ -1,18 +1,23 @@
 # docker-compose.prod.yml
-version: '3.8'
 
 services:
   api:
     build: ./backend
-    command: gunicorn --bind 0.0.0.0:8000 config.wsgi:application
+    command: sh -c "python manage.py collectstatic --noinput && gunicorn --bind 0.0.0.0:8000 config.wsgi:application"
     volumes:
-      - ./backend:/app
-    ports:
-      - "8000:8000"
+      - staticfiles_volume:/app/staticfiles # A api ESCREVE os arquivos estáticos aqui
     env_file:
-      - .env
+      - .env.production
+    # SEM PORTAS EXPOSTAS, mais seguro
 
   frontend:
     build: ./frontend
+    volumes:
+      - staticfiles_volume:/vol/static:ro # O frontend LÊ os arquivos daqui (somente leitura)
     ports:
-      - "3000:80"
+      - "3000:80" # A porta que o Load Balancer irá acessar
+    depends_on:
+      - api
+
+volumes:
+  staticfiles_volume: # O volume compartilhado
