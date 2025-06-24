@@ -7,6 +7,7 @@
 ## 🎯 0. Definição do Projeto: Carteira de Investimentos Inteligente
 
 ### 0.1. Problema a Ser Resolvido
+
 Muitos investidores, desde iniciantes até os mais experientes, enfrentam desafios significativos no gerenciamento de suas carteiras de investimento:
 
 * **Fragmentação de Informações:** Ativos espalhados por diversas corretoras e plataformas.
@@ -16,14 +17,17 @@ Muitos investidores, desde iniciantes até os mais experientes, enfrentam desafi
 * **Complexidade para Iniciantes:** Alta barreira de entrada para o gerenciamento de investimentos.
 
 ### 0.2. Solução Proposta
+
 Plataforma web intuitiva e poderosa que centraliza, analisa e oferece insights sobre as carteiras de investimento dos usuários, além de fornecer ferramentas de pesquisa de ativos para o público em geral.
 
 ### 0.3. Público-Alvo
-* **Investidores Individuais (Pessoa Física):** De iniciantes a experientes.
-* **Visitantes Interessados em Mercado Financeiro:** Buscando informações sobre ativos.
-* **Foco Inicial:** Mercado brasileiro de investimentos.
+
+* Investidores Individuais (Pessoa Física): De iniciantes a experientes.
+* Visitantes Interessados em Mercado Financeiro: Buscando informações sobre ativos.
+* Foco Inicial: Mercado brasileiro de investimentos.
 
 ### 0.4. Proposta de Valor Única (PVU)
+
 * **Consolidação Abrangente:** Integração de diversos tipos de ativos.
 * **Análises Inteligentes e Personalizadas:** Insights sobre diversificação, risco x retorno e projeções.
 * **Ferramentas de Pesquisa Pública:** Acesso aberto a informações e indicadores de ativos.
@@ -31,6 +35,7 @@ Plataforma web intuitiva e poderosa que centraliza, analisa e oferece insights s
 * **Foco na Experiência do Usuário:** Plataforma rápida, responsiva e agradável.
 
 ### 0.5. Objetivos Chave e Funcionalidades do MVP
+
 O MVP focará na consolidação manual e acompanhamento básico para usuários logados, ao mesmo tempo que oferecerá seções públicas para engajamento geral.
 
 * **Acesso Público (Não Logado):** Navegação em seções abertas (ex: fundamentos de ativos).
@@ -39,63 +44,72 @@ O MVP focará na consolidação manual e acompanhamento básico para usuários l
 
 ---
 
-## 🏗️ 1. Arquitetura de Alto Nível e Tecnologias Definidas
+## 1. Arquitetura de Alto Nível e Tecnologias Definidas
 
 ### 1.1. Frontend (Interface do Usuário)
-* **Tecnologia Principal:** `React.js`
+
+* **Tecnologia Principal:** React.js
 * **Princípio Fundamental:** HTML5 Semântico para garantir acessibilidade (a11y), SEO e manutenibilidade.
 * **Estilização/Componentes:** Design System customizado com componentes reutilizáveis.
-* **Plataforma de Deploy:** Vercel
-* **IaC/Configuração:** Arquivo `vercel.json`
+* **Plataforma de Deploy:** **Oracle Cloud Infrastructure (OCI)** - Por enquanto, hospedado diretamente na Cloud Oracle, possivelmente via Object Storage ou serviço de hospedagem estática, dependendo da avaliação.
+* **IaC/Configuração:** Arquivo `vercel.json` (mantido para futura transição, mas a implementação inicial será na OCI).
 
 ### 1.2. Backend (Lógica de Negócio e APIs)
-* **Tecnologia Principal:** Python com `Django`
-* **Padrão Arquitetural:** Clean Architecture e Domain-Driven Design (DDD)
-* **Empacotamento:** Contêineres Docker
-* **Plataforma de Deploy:** Render
-* **IaC/Configuração:** Arquivo `render.yaml`
-* **Comunicação:** API RESTful
+
+* **Tecnologia Principal:** Python com **Django**
+* **Padrão Arquitetural:** Clean Architecture e Domain-Driven Design (DDD).
+* **Empacotamento:** Contêineres Docker.
+* **Plataforma de Deploy:** **Oracle Cloud Infrastructure (OCI)** em uma VM dedicada para as imagens Docker.
+* **Comunicação:** API RESTful.
 
 ### 1.3. Banco de Dados Principal
-* **Tecnologia:** `PostgreSQL`
-* **Hospedagem:** Serviço Gerenciado de PostgreSQL da Render
-* **Backup:** Automatizado com retenção de 30 dias
+
+* **Tecnologia:** **MySQL**.
+* **Hospedagem:** **Serviço Gerenciado de MySQL da Oracle Cloud Infrastructure (OCI)**.
+* **Backup:** Automatizado com retenção de 30 dias.
 
 ### 1.4. Cache e Sessões
-* **Tecnologia:** `Redis`
-* **Hospedagem:** Serviço Gerenciado Redis da Render
-* **Funções:** Cache de queries, sessões, dados de mercado
+
+* **Tecnologia:** Redis.
+* **Hospedagem:** **Serviço Gerenciado Redis da Oracle Cloud Infrastructure (OCI)** (ou instância Redis em VM, se preferir).
+* **Funções:** Cache de queries, sessões, dados de mercado.
 
 ### 1.5. Mensageria e Filas de Tarefas (EDA Interna)
-* **Fila de Mensagens:** `RabbitMQ` (contêiner Docker na Render)
-* **Processamento Assíncrono:** `Celery` (contêineres Docker na Render)
-* **Scheduler:** `Celery Beat` para tarefas periódicas
+
+* **Fila de Mensagens:** RabbitMQ (**contêiner Docker na VM da OCI**).
+* **Processamento Assíncrono:** Celery (**contêineres Docker na VM da OCI**).
+* **Scheduler:** Celery Beat para tarefas periódicas.
 
 ### 1.6. API Gateway
-* **Tecnologia:** `Kong` (contêiner Docker na Render)
-* **Funções:** Roteamento, segurança (validação de token, rate limiting), logging
+
+* **Tecnologia:** Kong (**contêiner Docker na VM da OCI**).
+* **Funções:** Roteamento, segurança (validação de token, rate limiting), logging.
 
 ### 1.7. Autenticação e Autorização Centralizada
-* **Tecnologia:** `Keycloak` (contêiner Docker com disco persistente na Render)
-* **Funções:** Gerenciamento de identidades, emissão de tokens JWT (OAuth2/OIDC)
+
+* **Tecnologia:** Keycloak (**contêiner Docker com disco persistente na VM da OCI**).
+* **Funções:** Gerenciamento de identidades, emissão de tokens JWT (OAuth2/OIDC).
 
 ### 1.8. Containerização e Orquestração
-* **Tecnologia:** `Docker` e `Docker Compose`
-* **Desenvolvimento:** `Docker Compose` para ambiente local completo
-* **Produção:** Containers individuais no Render
-* **Imagens Base:** Python oficial (slim) para otimização
+
+* **Tecnologia:** Docker e Docker Compose.
+* **Desenvolvimento:** Docker Compose para ambiente local completo.
+* **Produção:** **Containers individuais na VM da OCI**.
+* **Imagens Base:** Python oficial (slim) para otimização.
 
 ### 1.9. Versionamento de Código (SCM)
-* **Ferramenta:** `Git`
-* **Plataforma:** `GitHub`
-* **Estratégia de Branching:** Gitflow
-* **Versionamento de Releases:** Versionamento Semântico (SemVer)
+
+* **Ferramenta:** Git.
+* **Plataforma:** GitHub.
+* **Estratégia de Branching:** Gitflow.
+* **Versionamento de Releases:** Versionamento Semântico (SemVer).
 
 ### 1.10. Integração Contínua e Deploy Contínuo (CI/CD)
-* **Frontend (Vercel):** CI/CD integrado com GitHub
-* **Backend (Render):** CI/CD integrado com GitHub
-* **Estratégia:** Deploy-First Approach com validação contínua
-* **Testes:** Automatizados em todas as etapas
+
+* **Frontend (OCI):** CI/CD integrado com GitHub (utilizando os serviços da OCI para deploy do frontend estático, ou GitHub Actions para push para o Object Storage/serviço de hospedagem estática).
+* **Backend (OCI):** CI/CD integrado com GitHub (usando ferramentas de CI/CD da OCI, se disponíveis, ou alternativas como GitHub Actions para deploy na VM).
+* **Estratégia:** Deploy-First Approach com validação contínua.
+* **Testes:** Automatizados em todas as etapas.
 
 ---
 
